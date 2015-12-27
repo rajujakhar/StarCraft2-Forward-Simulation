@@ -2,8 +2,8 @@
 This program reads the data from input csv files and stores them in a map with key, value pair
 
 Author : Raju Ram
-Last Modified : 27th Dec 2015
-Version : 1.0
+Last Modified : 28th Dec 2015
+Version : 1.1
 
 */
 
@@ -21,16 +21,43 @@ int main()
 	Building b1;	
 
 	// Create a map whos key is a string and value is an object of class Building
-	std::map<std::string,Building> map1;	
+	std::map<std::string,Building> unit_map_Protoss, unit_map_Zerg, unit_map_Terran, building_map_Protoss, building_map_Zerg, building_map_Terran;
 	char delim = ',';
-	std::string line,attr;
+	bool isUnit=true,isProtoss=true, isZerg=false, isTerran=false;
+	std::string line,attr,blank("blank");
 
 	std::ifstream file_;
 	file_.open("techtrees.csv");
 
 	// Read the entire line
 	while(getline(file_, line)) {
-		
+
+		if(isUnit) { 
+				if(line.substr(0,10) =="#buildings")
+				{
+					std::cout <<" line.substr(0,10): " << line.substr(0,10) << "\n";
+					isUnit = false;
+				}
+			}
+		if(isProtoss && !isUnit) {		
+				if(line.substr(0,10) == "#  Zerg  #")
+				{
+					std::cout <<" line.substr(0,10): " << line.substr(0,10) << "\n";
+					isProtoss = false;
+					isZerg= true;
+					isUnit = true;	
+				}
+			}
+		if(isZerg && !isUnit) {	
+				if(line.substr(0,10) == "# Terran #")
+				{
+					std::cout <<" line.substr(0,10): " << line.substr(0,10) << "\n";
+					isZerg= false;
+					isTerran = true;
+					isUnit = true;
+				}
+			}	
+				
 		// The following if condition has been written to ignore the lines in techtress.csv which starts with #
 		if(line.front() != '#') {
 			// convert the line into stringstream
@@ -58,10 +85,31 @@ int main()
 			getline(s1, attr, delim);
 			b1.produced_by =attr;
 			getline(s1, attr, delim);
+			if(attr == "") attr = blank;	
 			b1.dependency = attr;
 
-			// insert the entry into map1
-			map1.insert(std::pair<std::string,Building>(b1.name, b1));
+
+			// insert the entry into map
+			if(isProtoss) {
+				if(isUnit)
+					unit_map_Protoss.insert(std::pair<std::string,Building>(b1.name, b1));
+				else 
+					building_map_Protoss.insert(std::pair<std::string,Building>(b1.name, b1));
+			}
+
+			else if(isZerg) {
+				if(isUnit)
+					unit_map_Zerg.insert(std::pair<std::string,Building>(b1.name, b1));
+				else 
+					building_map_Zerg.insert(std::pair<std::string,Building>(b1.name, b1));
+			}
+
+			else {
+				if(isUnit)
+					unit_map_Terran.insert(std::pair<std::string,Building>(b1.name, b1));
+				else 
+					building_map_Terran.insert(std::pair<std::string,Building>(b1.name, b1));
+			}
 		}
 
 	}	
@@ -69,15 +117,51 @@ int main()
 	file_.close();
 
 	// In the following way we can print the contents of map 
-	std::cout << "Name of the Building" << "  -->  " << "# Mineral required\n";
-	for( auto it = map1.begin(); it != map1.end(); ++it)	{
+	std::cout << "Name of the Unit for Protoss" << "  -->  " << "# Mineral required\n";
+	for( auto it = unit_map_Protoss.begin(); it != unit_map_Protoss.end(); ++it)	{
 
 	std::cout <<  it->first  << " 	-->	 "  <<  (*it).second.mineral_req << "\n";
 
 	}
 
+	std::cout << "Name of the Building for Protoss" << "  -->  " << "# Mineral required\n";
+	for( auto it = building_map_Protoss.begin(); it != building_map_Protoss.end(); ++it)	{
+
+	std::cout <<  it->first  << " 	-->	 "  <<  (*it).second.mineral_req << "\n";
+
+	}
+
+	/*
+	std::cout << "Name of the Unit for Zerg" << "  -->  " << "# Mineral required\n";
+	for( auto it = unit_map_Zerg.begin(); it != unit_map_Zerg.end(); ++it)	{
+
+	std::cout <<  it->first  << " 	-->	 "  <<  (*it).second.mineral_req << "\n";
+
+	}
+
+	std::cout << "Name of the Building for Zerg" << "  -->  " << "# Mineral required\n";
+	for( auto it = building_map_Zerg.begin(); it != building_map_Zerg.end(); ++it)	{
+
+	std::cout <<  it->first  << " 	-->	 "  <<  (*it).second.mineral_req << "\n";
+
+	}
+
+	std::cout << "Name of the Unit for Terran" << "  -->  " << "# Mineral required\n";
+	for( auto it = unit_map_Terran.begin(); it != unit_map_Terran.end(); ++it)	{
+
+	std::cout <<  it->first  << " 	-->	 "  <<  (*it).second.mineral_req << "\n";
+
+	}
+
+	std::cout << "Name of the Building for Terran" << "  -->  " << "# Mineral required\n";
+	for( auto it = building_map_Terran.begin(); it != building_map_Terran.end(); ++it)	{
+
+	std::cout <<  it->first  << " 	-->	 "  <<  (*it).second.mineral_req << "\n";
+
+	} */
+
 	// If we want to access 'produced_by' attribute of a building we can do it the following way
-	std::cout << "\n\n\nprobe is produced by" << (map1.find("probe")->second).produced_by <<"\n\n"; 
+	//std::cout << "\n\n\nprobe is produced by" << (unit_map_Protoss.find("probe")->second).produced_by <<"\n\n"; 
  
 
 }
